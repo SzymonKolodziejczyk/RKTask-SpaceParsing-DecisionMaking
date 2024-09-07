@@ -5,59 +5,18 @@ public class Pathfinding : MonoBehaviour
 {
     public List<GraphGenerator.Node> FindPath(GraphGenerator.Node start, GraphGenerator.Node goal, List<GraphGenerator.Node> graph)
     {
-        // Check if start or goal nodes are blocked
-        if (IsNodeBlocked(start))
+        Debug.Log($"Starting pathfinding from {start.position} to {goal.position}");
+
+        // Perform pathfinding logic
+        List<GraphGenerator.Node> path = AStarPathfinding(start, goal);
+        
+        if (path == null || path.Count == 0)
         {
-            Debug.Log("Start node is blocked.");
+            Debug.LogError("No path found in A*.");
             return null;
         }
-
-        if (IsNodeBlocked(goal))
-        {
-            Debug.Log("Goal node is blocked.");
-            return null;
-        }
-
-        // Check if the graph is connected
-        if (!IsGraphConnected(graph))
-        {
-            Debug.Log("Graph is not fully connected, some areas are unreachable.");
-            return null;
-        }
-
-        // Proceed with pathfinding
-        return AStarPathfinding(start, goal);
-    }
-
-    private bool IsNodeBlocked(GraphGenerator.Node node)
-    {
-        return node.neighbors.Count == 0;
-    }
-
-    private bool IsGraphConnected(List<GraphGenerator.Node> graph)
-    {
-        HashSet<GraphGenerator.Node> visited = new HashSet<GraphGenerator.Node>();
-        Queue<GraphGenerator.Node> queue = new Queue<GraphGenerator.Node>();
-
-        queue.Enqueue(graph[0]);
-        visited.Add(graph[0]);
-
-        while (queue.Count > 0)
-        {
-            GraphGenerator.Node current = queue.Dequeue();
-
-            foreach (GraphGenerator.Node neighbor in current.neighbors)
-            {
-                if (!visited.Contains(neighbor))
-                {
-                    visited.Add(neighbor);
-                    queue.Enqueue(neighbor);
-                }
-            }
-        }
-
-        // If visited all nodes, the graph is connected
-        return visited.Count == graph.Count;
+        
+        return path;
     }
 
     private List<GraphGenerator.Node> AStarPathfinding(GraphGenerator.Node start, GraphGenerator.Node goal)

@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class GraphGenerator : MonoBehaviour
 {
-    public float npcRadius = 0.5f; // Radius of the NPC for tight path handling
-
     public class Node
     {
         public Vector2 position;
@@ -17,80 +15,50 @@ public class GraphGenerator : MonoBehaviour
         }
     }
 
-    public List<Node> GenerateGraph(Vector2[][] cubes)
+    public List<Node> GenerateGraph(NPCPathConfig npcPathConfig)
     {
-        List<Node> nodes = CreateNodesFromCubes(cubes);
-        ConnectNodes(nodes, cubes);
-        RemoveIsolatedNodes(nodes); // Handle isolated nodes
+        if (npcPathConfig == null)
+        {
+            Debug.LogError("NPCPathConfig is not assigned in GraphGenerator!");
+            return null;
+        }
+
+        List<Node> nodes = CreateNodesFromScriptableObject(npcPathConfig.nodePositions);
+        ConnectNodesFromScriptableObject(nodes, npcPathConfig.paths);
         return nodes;
     }
 
-    private List<Node> CreateNodesFromCubes(Vector2[][] cubes)
+    private List<Node> CreateNodesFromScriptableObject(List<Vector2> nodePositions)
     {
         List<Node> nodes = new List<Node>();
-        foreach (var cube in cubes)
+        foreach (var position in nodePositions)
         {
-            foreach (var corner in cube)
-            {
-                Node newNode = new Node(corner);
-                nodes.Add(newNode);
-            }
+            Node newNode = new Node(position);
+            nodes.Add(newNode);
         }
         return nodes;
     }
 
-    private void ConnectNodes(List<Node> nodes, Vector2[][] cubes)
+    private void ConnectNodesFromScriptableObject(List<Node> nodes, List<NPCPathConfig.Path> paths)
     {
-        for (int i = 0; i < nodes.Count; i++)
+        Debug.Log($"Total nodes available: {nodes.Count}");
+
+        foreach (var path in paths)
         {
-            for (int j = i + 1; j < nodes.Count; j++)
+            if (path.startNodeIndex >= 0 && path.startNodeIndex < nodes.Count &&
+                path.endNodeIndex >= 0 && path.endNodeIndex < nodes.Count)
             {
-                if (IsPathClear(nodes[i].position, nodes[j].position, cubes, npcRadius))
-                {
-                    nodes[i].neighbors.Add(nodes[j]);
-                    nodes[j].neighbors.Add(nodes[i]);
-                }
+                Node startNode = nodes[path.startNodeIndex];
+                Node endNode = nodes[path.endNodeIndex];
+                startNode.neighbors.Add(endNode);
+                endNode.neighbors.Add(startNode);
+                
+                Debug.Log($"Connected Node {path.startNodeIndex} to Node {path.endNodeIndex}");
+            }
+            else
+            {
+                Debug.LogError($"Invalid node indices: startNodeIndex {path.startNodeIndex}, endNodeIndex {path.endNodeIndex}");
             }
         }
-    }
-
-    // Check if the path between two nodes is clear, considering NPC radius
-    private bool IsPathClear(Vector2 start, Vector2 end, Vector2[][] cubes, float npcRadius)
-    {
-        foreach (var cube in cubes)
-        {
-            for (int i = 0; i < cube.Length; i++)
-            {
-                Vector2 p1 = cube[i];
-                Vector2 p2 = cube[(i + 1) % cube.Length];
-
-                if (DoLinesIntersect(start, end, p1, p2, npcRadius))
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // Modify line intersection check to account for NPC radius
-    private bool DoLinesIntersect(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, float radius)
-    {
-        // Simple line intersection logic can be expanded to use the radius
-        // In this case, we're calculating buffer zones by expanding the lines
-        float determinant = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
-        if (determinant == 0) return false;
-
-        float t = ((a1.x - b1.x) * (b2.y - b1.y) - (a1.y - b1.y) * (b2.x - b1.x)) / determinant;
-        float u = -((a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x)) / determinant;
-
-        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
-    }
-
-    // Handle isolated nodes by removing them from the graph
-    private void RemoveIsolatedNodes(List<Node> nodes)
-    {
-        nodes.RemoveAll(node => node.neighbors.Count == 0);
-        // This will remove nodes with no neighbors, marking them as unreachable
     }
 }
