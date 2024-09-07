@@ -1,81 +1,35 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
-public class Pathfinding : MonoBehaviour
+public class SimplePathfinding : MonoBehaviour
 {
-    public List<GraphGenerator.Node> FindPath(GraphGenerator.Node start, GraphGenerator.Node goal, List<GraphGenerator.Node> graph)
+    public List<GraphGenerator.Node> FindPath(GraphGenerator.Node start, GraphGenerator.Node goal, List<GraphGenerator.Node> graph, NPCPathConfig npcPathConfig)
     {
-        Debug.Log($"Starting pathfinding from {start.position} to {goal.position}");
+        List<GraphGenerator.Node> path = new List<GraphGenerator.Node>();
 
-        // Perform pathfinding logic
-        List<GraphGenerator.Node> path = AStarPathfinding(start, goal);
-        
-        if (path == null || path.Count == 0)
+        GraphGenerator.Node currentNode = start;
+        path.Add(currentNode);  // Add the start node
+
+        while (currentNode != goal)
         {
-            Debug.LogError("No path found in A*.");
-            return null;
-        }
-        
-        return path;
-    }
-
-    private List<GraphGenerator.Node> AStarPathfinding(GraphGenerator.Node start, GraphGenerator.Node goal)
-    {
-        HashSet<GraphGenerator.Node> closedSet = new HashSet<GraphGenerator.Node>();
-        PriorityQueue<GraphGenerator.Node> openSet = new PriorityQueue<GraphGenerator.Node>();
-        Dictionary<GraphGenerator.Node, GraphGenerator.Node> cameFrom = new Dictionary<GraphGenerator.Node, GraphGenerator.Node>();
-
-        Dictionary<GraphGenerator.Node, float> gScore = new Dictionary<GraphGenerator.Node, float>();
-        Dictionary<GraphGenerator.Node, float> fScore = new Dictionary<GraphGenerator.Node, float>();
-
-        gScore[start] = 0;
-        fScore[start] = Vector2.Distance(start.position, goal.position);
-
-        openSet.Enqueue(start, fScore[start]);
-
-        while (openSet.Count > 0)
-        {
-            GraphGenerator.Node current = openSet.Dequeue();
-
-            if (current == goal)
+            // Find the next node that is a neighbor and hasn't been visited yet
+            foreach (var pathConfig in npcPathConfig.paths)
             {
-                return ReconstructPath(cameFrom, current);
-            }
-
-            closedSet.Add(current);
-
-            foreach (GraphGenerator.Node neighbor in current.neighbors)
-            {
-                if (closedSet.Contains(neighbor)) continue;
-
-                float tentative_gScore = gScore[current] + Vector2.Distance(current.position, neighbor.position);
-
-                if (!gScore.ContainsKey(neighbor) || tentative_gScore < gScore[neighbor])
+                if (pathConfig.startNodeIndex == graph.IndexOf(currentNode))
                 {
-                    cameFrom[neighbor] = current;
-                    gScore[neighbor] = tentative_gScore;
-                    fScore[neighbor] = gScore[neighbor] + Vector2.Distance(neighbor.position, goal.position);
-
-                    if (!openSet.Contains(neighbor))
-                    {
-                        openSet.Enqueue(neighbor, fScore[neighbor]);
-                    }
+                    GraphGenerator.Node nextNode = graph[pathConfig.endNodeIndex];
+                    path.Add(nextNode);
+                    currentNode = nextNode;
+                    break;
                 }
             }
         }
 
-        return null; // Path not found
-    }
-
-    private List<GraphGenerator.Node> ReconstructPath(Dictionary<GraphGenerator.Node, GraphGenerator.Node> cameFrom, GraphGenerator.Node current)
-    {
-        List<GraphGenerator.Node> path = new List<GraphGenerator.Node> { current };
-        while (cameFrom.ContainsKey(current))
+        if (path.Count == 0)
         {
-            current = cameFrom[current];
-            path.Add(current);
+            Debug.LogError("No valid path found in SimplePathfinding.");
         }
-        path.Reverse();
+
         return path;
     }
 }

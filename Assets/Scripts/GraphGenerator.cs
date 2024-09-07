@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GraphGenerator : MonoBehaviour
 {
@@ -15,19 +15,32 @@ public class GraphGenerator : MonoBehaviour
         }
     }
 
+    // Generate the graph based on the ScriptableObject's node positions and paths
     public List<Node> GenerateGraph(NPCPathConfig npcPathConfig)
     {
-        if (npcPathConfig == null)
+        Debug.Log("Generating graph from NPCPathConfig...");
+
+        // Create nodes based on the positions in NPCPathConfig
+        List<Node> nodes = CreateNodesFromScriptableObject(npcPathConfig.nodePositions);
+
+        // Connect the nodes based on paths in NPCPathConfig
+        ConnectNodesFromScriptableObject(nodes, npcPathConfig.paths);
+
+        // Debugging: Log the nodes and their neighbors
+        Debug.Log("Nodes and their connections:");
+        for (int i = 0; i < nodes.Count; i++)
         {
-            Debug.LogError("NPCPathConfig is not assigned in GraphGenerator!");
-            return null;
+            Debug.Log($"Node {i} at position {nodes[i].position} is connected to {nodes[i].neighbors.Count} neighbors:");
+            foreach (var neighbor in nodes[i].neighbors)
+            {
+                Debug.Log($"  Neighbor at position {neighbor.position}");
+            }
         }
 
-        List<Node> nodes = CreateNodesFromScriptableObject(npcPathConfig.nodePositions);
-        ConnectNodesFromScriptableObject(nodes, npcPathConfig.paths);
         return nodes;
     }
 
+    // Create nodes based on positions defined in NPCPathConfig
     private List<Node> CreateNodesFromScriptableObject(List<Vector2> nodePositions)
     {
         List<Node> nodes = new List<Node>();
@@ -39,10 +52,9 @@ public class GraphGenerator : MonoBehaviour
         return nodes;
     }
 
+    // Connect nodes based on paths defined in NPCPathConfig
     private void ConnectNodesFromScriptableObject(List<Node> nodes, List<NPCPathConfig.Path> paths)
     {
-        Debug.Log($"Total nodes available: {nodes.Count}");
-
         foreach (var path in paths)
         {
             if (path.startNodeIndex >= 0 && path.startNodeIndex < nodes.Count &&
@@ -50,9 +62,17 @@ public class GraphGenerator : MonoBehaviour
             {
                 Node startNode = nodes[path.startNodeIndex];
                 Node endNode = nodes[path.endNodeIndex];
-                startNode.neighbors.Add(endNode);
-                endNode.neighbors.Add(startNode);
-                
+
+                // Add connections between nodes
+                if (!startNode.neighbors.Contains(endNode))
+                {
+                    startNode.neighbors.Add(endNode);
+                }
+                if (!endNode.neighbors.Contains(startNode))
+                {
+                    endNode.neighbors.Add(startNode);
+                }
+
                 Debug.Log($"Connected Node {path.startNodeIndex} to Node {path.endNodeIndex}");
             }
             else

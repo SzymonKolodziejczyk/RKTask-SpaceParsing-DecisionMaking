@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class MasterController : MonoBehaviour
 {
-    private Pathfinding pathfinding;
+    private SimplePathfinding pathfinding;
     private GraphGenerator graphGenerator;
     private NPCController npcController;
     public NPCPathConfig npcPathConfig;  // Reference to the ScriptableObject
@@ -11,16 +11,9 @@ public class MasterController : MonoBehaviour
     void Awake()
     {
         // Retrieve components attached to the same GameObject
-        pathfinding = GetComponent<Pathfinding>();
+        pathfinding = GetComponent<SimplePathfinding>();
         graphGenerator = GetComponent<GraphGenerator>();
         npcController = GetComponent<NPCController>();
-
-        // Error handling if the components are missing
-        if (pathfinding == null || graphGenerator == null || npcController == null)
-        {
-            Debug.LogError("One or more required components are missing from the MasterController's GameObject!");
-            return;
-        }
 
         if (npcPathConfig == null)
         {
@@ -33,29 +26,26 @@ public class MasterController : MonoBehaviour
     {
         // Generate the graph using GraphGenerator
         List<GraphGenerator.Node> graph = graphGenerator.GenerateGraph(npcPathConfig);
-        if (graph == null)
+
+        if (graph == null || graph.Count == 0)
         {
-            Debug.LogError("Failed to generate graph.");
+            Debug.LogError("Graph is empty or failed to generate.");
             return;
         }
 
         // Set start and goal nodes
-        GraphGenerator.Node startNode = graph[0];
-        GraphGenerator.Node goalNode = graph[graph.Count - 1];
+        GraphGenerator.Node startNode = graph[0]; // Assume start is node 0
+        GraphGenerator.Node goalNode = graph[graph.Count - 1]; // Assume goal is last node
 
-        // Debugging
-        Debug.Log($"Start Node Position: {startNode.position}");
-        Debug.Log($"Goal Node Position: {goalNode.position}");
-
-        // Find the path using Pathfinding
-        List<GraphGenerator.Node> path = pathfinding.FindPath(startNode, goalNode, graph);
+        // Find the path using SimplePathfinding
+        List<GraphGenerator.Node> path = pathfinding.FindPath(startNode, goalNode, graph, npcPathConfig);
         if (path == null || path.Count == 0)
         {
             Debug.LogError("No path found.");
             return;
         }
 
-        // Pass the path to NPCController
+        // Pass the path to NPCController to handle NPC movement
         npcController.SetPath(path, npcPathConfig.moveSpeed);
     }
 }
