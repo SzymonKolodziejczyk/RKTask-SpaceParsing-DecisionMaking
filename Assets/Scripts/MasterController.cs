@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class MasterController : MonoBehaviour
 {
-    private SimplePathfinding pathfinding;
+    private Pathfinding pathfinding;
     private GraphGenerator graphGenerator;
     private NPCController npcController;
     public NPCPathConfig npcPathConfig;  // Reference to the ScriptableObject
@@ -11,7 +11,7 @@ public class MasterController : MonoBehaviour
     void Awake()
     {
         // Retrieve components attached to the same GameObject
-        pathfinding = GetComponent<SimplePathfinding>();
+        pathfinding = GetComponent<Pathfinding>();
         graphGenerator = GetComponent<GraphGenerator>();
         npcController = GetComponent<NPCController>();
 
@@ -37,7 +37,7 @@ public class MasterController : MonoBehaviour
         GraphGenerator.Node startNode = graph[0]; // Assume start is node 0
         GraphGenerator.Node goalNode = graph[graph.Count - 1]; // Assume goal is last node
 
-        // Find the path using SimplePathfinding
+        // Find the path using Pathfinding
         List<GraphGenerator.Node> path = pathfinding.FindPath(startNode, goalNode, graph, npcPathConfig);
         if (path == null || path.Count == 0)
         {
