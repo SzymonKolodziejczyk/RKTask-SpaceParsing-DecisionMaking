@@ -11,6 +11,12 @@ public class NPCPathConfig : ScriptableObject
     public List<string> randomThoughts;
     public float pauseDuration = 1f;
 
+    [Range(0, 100)] // Thinking percentage chance (0-100%)
+    public float thinkingChance = 30f; // Chance to think, in percentage
+
+    [Range(0, 100)] // Rotating percentage chance (0-100%)
+    public float rotatingChance = 30f; // Chance to rotate, in percentage
+
     [System.Serializable]
     public class Path
     {
