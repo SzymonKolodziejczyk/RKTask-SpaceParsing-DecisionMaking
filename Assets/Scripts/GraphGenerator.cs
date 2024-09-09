@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 public class GraphGenerator : MonoBehaviour
 {
+    public GameObject nodeMarkerDefault; // Assign in the inspector
+
     public class Node
     {
         public Vector2 position;
         public List<Node> neighbors;
+        public GameObject markerInstance; // Reference to the marker instance
 
         public Node(Vector2 pos)
         {
@@ -15,32 +18,23 @@ public class GraphGenerator : MonoBehaviour
         }
     }
 
-    // Generate the graph based on the ScriptableObject's node positions and paths
     public List<Node> GenerateGraph(NPCPathConfig npcPathConfig)
     {
         Debug.Log("Generating graph from NPCPathConfig...");
 
-        // Create nodes based on the positions in NPCPathConfig
         List<Node> nodes = CreateNodesFromScriptableObject(npcPathConfig.nodePositions);
 
-        // Connect the nodes based on paths in NPCPathConfig
-        ConnectNodesFromScriptableObject(nodes, npcPathConfig.paths);
+        ConnectNodesInSequence(nodes); // Connect nodes in sequence
 
-        // Debugging: Log the nodes and their neighbors
-        Debug.Log("Nodes and their connections:");
-        for (int i = 0; i < nodes.Count; i++)
+        // Instantiate a marker at each node position
+        foreach (var node in nodes)
         {
-            Debug.Log($"Node {i} at position {nodes[i].position} is connected to {nodes[i].neighbors.Count} neighbors:");
-            foreach (var neighbor in nodes[i].neighbors)
-            {
-                Debug.Log($"  Neighbor at position {neighbor.position}");
-            }
+            InstantiateNodeMarker(node.position);
         }
 
         return nodes;
     }
 
-    // Create nodes based on positions defined in NPCPathConfig
     private List<Node> CreateNodesFromScriptableObject(List<Vector2> nodePositions)
     {
         List<Node> nodes = new List<Node>();
@@ -52,33 +46,26 @@ public class GraphGenerator : MonoBehaviour
         return nodes;
     }
 
-    // Connect nodes based on paths defined in NPCPathConfig
-    private void ConnectNodesFromScriptableObject(List<Node> nodes, List<NPCPathConfig.Path> paths)
+    // Connect nodes in sequence based on their positions in the list
+    private void ConnectNodesInSequence(List<Node> nodes)
     {
-        foreach (var path in paths)
+        for (int i = 0; i < nodes.Count - 1; i++)
         {
-            if (path.startNodeIndex >= 0 && path.startNodeIndex < nodes.Count &&
-                path.endNodeIndex >= 0 && path.endNodeIndex < nodes.Count)
-            {
-                Node startNode = nodes[path.startNodeIndex];
-                Node endNode = nodes[path.endNodeIndex];
+            nodes[i].neighbors.Add(nodes[i + 1]);  // Connect to the next node
+            nodes[i + 1].neighbors.Add(nodes[i]);  // Connect back to the previous node (if bi-directional)
+        }
+    }
 
-                // Add connections between nodes
-                if (!startNode.neighbors.Contains(endNode))
-                {
-                    startNode.neighbors.Add(endNode);
-                }
-                if (!endNode.neighbors.Contains(startNode))
-                {
-                    endNode.neighbors.Add(startNode);
-                }
-
-                Debug.Log($"Connected Node {path.startNodeIndex} to Node {path.endNodeIndex}");
-            }
-            else
-            {
-                Debug.LogError($"Invalid node indices: startNodeIndex {path.startNodeIndex}, endNodeIndex {path.endNodeIndex}");
-            }
+    // Instantiate a marker at each node position
+    private void InstantiateNodeMarker(Vector2 position)
+    {
+        if (nodeMarkerDefault != null)
+        {
+            Instantiate(nodeMarkerDefault, new Vector3(position.x, position.y, 0), Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogError("Node marker prefab is not assigned.");
         }
     }
 }

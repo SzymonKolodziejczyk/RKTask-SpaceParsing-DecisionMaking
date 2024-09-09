@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 public class NPCController : MonoBehaviour
 {
-    private List<GraphGenerator.Node> currentPath;  // The path of nodes to follow
-    private int currentPathIndex = 0;               // Track which node we're heading to
-    private bool isMoving = false;                  // Track whether the NPC is moving
-    private float moveSpeed;                        // The NPC's movement speed
+    private List<GraphGenerator.Node> currentPath;
+    private int currentPathIndex = 0;
+    private bool isMoving = false;
+    private float moveSpeed;
 
     public void SetPath(List<GraphGenerator.Node> path, float speed)
     {
@@ -26,7 +26,7 @@ public class NPCController : MonoBehaviour
     {
         if (isMoving && currentPath != null && currentPath.Count > 0)
         {
-            MoveAlongPath();  // Continuously move along the path
+            MoveAlongPath();
         }
     }
 
@@ -45,7 +45,7 @@ public class NPCController : MonoBehaviour
         float step = moveSpeed * Time.deltaTime;
         transform.position = Vector2.MoveTowards(currentPosition, targetPosition, step);
 
-        if (Vector2.Distance(transform.position, targetPosition) < 0.05f)  // Adjust threshold
+        if (Vector2.Distance(transform.position, targetPosition) < 0.05f)
         {
             Debug.Log($"NPC reached node {currentPathIndex} at position {targetPosition}");
             currentPathIndex++;
@@ -53,7 +53,7 @@ public class NPCController : MonoBehaviour
             if (currentPathIndex >= currentPath.Count)
             {
                 currentPathIndex = 0; // Loop back to the start
-                isMoving = true; // Start moving again
+                isMoving = true;
             }
         }
     }

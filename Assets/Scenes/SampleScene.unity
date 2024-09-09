@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 27183616}
   - component: {fileID: 27183615}
   - component: {fileID: 27183614}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BorderWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 170301547}
   - component: {fileID: 170301546}
   - component: {fileID: 170301545}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -380,6 +380,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01638eeb6e391924db56bc5ff04b56b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nodeMarkerDefault: {fileID: 3714905937583209883, guid: d43019057313d2846bd10110bf16144e, type: 3}
 --- !u!114 &260389441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,7 +430,7 @@ GameObject:
   - component: {fileID: 292656687}
   - component: {fileID: 292656686}
   - component: {fileID: 292656685}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -445,8 +446,8 @@ Transform:
   m_GameObject: {fileID: 292656683}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -3.8900008, y: -2.49, z: 5.759794}
-  m_LocalScale: {x: 6, y: 0.20000002, z: 0.2}
+  m_LocalPosition: {x: -3.8900008, y: -2.11, z: 5.759794}
+  m_LocalScale: {x: 7, y: 0.20000002, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1741254762}
@@ -628,7 +629,7 @@ GameObject:
   - component: {fileID: 781000178}
   - component: {fileID: 781000177}
   - component: {fileID: 781000176}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BorderWall (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -733,7 +734,7 @@ GameObject:
   - component: {fileID: 785915194}
   - component: {fileID: 785915193}
   - component: {fileID: 785915192}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -749,8 +750,8 @@ Transform:
   m_GameObject: {fileID: 785915190}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -9.830002, y: -1.2699997, z: 5.759794}
-  m_LocalScale: {x: 4, y: 0.20000002, z: 0.2}
+  m_LocalPosition: {x: -9.830002, y: -1.7, z: 5.759794}
+  m_LocalScale: {x: 3.40124, y: 0.20000002, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1741254762}
@@ -838,7 +839,7 @@ GameObject:
   - component: {fileID: 853426537}
   - component: {fileID: 853426536}
   - component: {fileID: 853426535}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -943,7 +944,7 @@ GameObject:
   - component: {fileID: 960994008}
   - component: {fileID: 960994007}
   - component: {fileID: 960994006}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BorderWall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1140,7 +1141,7 @@ GameObject:
   - component: {fileID: 1096601764}
   - component: {fileID: 1096601763}
   - component: {fileID: 1096601762}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1351,7 +1352,7 @@ GameObject:
   - component: {fileID: 1552008818}
   - component: {fileID: 1552008817}
   - component: {fileID: 1552008816}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1605,7 +1606,7 @@ GameObject:
   - component: {fileID: 1832566618}
   - component: {fileID: 1832566617}
   - component: {fileID: 1832566616}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1710,7 +1711,7 @@ GameObject:
   - component: {fileID: 2082670568}
   - component: {fileID: 2082670567}
   - component: {fileID: 2082670566}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BorderWall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

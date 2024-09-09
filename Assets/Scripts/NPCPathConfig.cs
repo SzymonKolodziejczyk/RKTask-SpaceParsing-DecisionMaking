@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class NPCPathConfig : ScriptableObject
 {
     public List<Vector2> nodePositions; // Node positions for the graph
-    public List<Path> paths; // Path connections between nodes
     public float npcRadius = 0.5f; // Radius for pathing
     public float moveSpeed = 2f; // Speed of the NPC
 
