@@ -12,6 +12,15 @@ public class NPCController : MonoBehaviour
     private bool isPaused = false;
     private NPCPathConfig npcPathConfig;
 
+    // Reference to VisionCone
+    public VisionCone visionCone;
+
+    void Start()
+    {
+        // Reset the NPC's rotation to eliminate complications with 0, 90, 90 setup
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
     public void SetPath(List<GraphGenerator.Node> path, float speed, NPCPathConfig config)
     {
         currentPath = path;
@@ -25,6 +34,12 @@ public class NPCController : MonoBehaviour
         for (int i = 0; i < currentPath.Count; i++)
         {
             Debug.Log($"Node {i}: {currentPath[i].position}");
+        }
+
+        // Update vision cone (if needed)
+        if (visionCone != null)
+        {
+            visionCone.UpdateVisionCone();
         }
     }
 
@@ -51,11 +66,13 @@ public class NPCController : MonoBehaviour
         float step = moveSpeed * Time.deltaTime;
         transform.position = Vector2.MoveTowards(currentPosition, targetPosition, step);
 
+        // Rotate towards the direction of movement
+        RotateTowards(targetPosition);
+
         if (Vector2.Distance(transform.position, targetPosition) < 0.05f)
         {
             Debug.Log($"NPC reached node {currentPathIndex} at position {targetPosition}");
 
-            // Validate that combined chances don't exceed 100
             float totalChance = npcPathConfig.thinkingChance + npcPathConfig.rotatingChance;
 
             if (totalChance > 100f)
@@ -64,25 +81,41 @@ public class NPCController : MonoBehaviour
                 return;
             }
 
-            // Generate a random number between 0 and 100
             float randomValue = Random.Range(0f, 100f);
 
-            // Decision logic based on percentage chances
-            if (randomValue < npcPathConfig.thinkingChance) // Think
+            if (randomValue < npcPathConfig.thinkingChance) 
             {
                 StartCoroutine(PauseAndThink());
             }
-            else if (randomValue < npcPathConfig.thinkingChance + npcPathConfig.rotatingChance) // Rotate
+            else if (randomValue < npcPathConfig.thinkingChance + npcPathConfig.rotatingChance) 
             {
                 StartCoroutine(LookAround());
             }
-            else // Do nothing, go to the next node
+            else 
             {
                 Debug.Log("NPC does nothing and continues to the next node.");
-                isPaused = false; // Continue to the next node
+                isPaused = false;
             }
 
             currentPathIndex++;
+        }
+    }
+
+    // Rotate the NPC and VisionCone to face the direction it's moving towards
+    private void RotateTowards(Vector2 targetPosition)
+    {
+        Vector2 direction = targetPosition - (Vector2)transform.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        // Smoothly rotate the NPC towards the target direction
+        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+
+        // Ensure the VisionCone follows the NPC's rotation and points in the direction of movement
+        if (visionCone != null)
+        {
+            // Rotate the vision cone in sync with the NPC's rotation
+            visionCone.transform.localRotation = Quaternion.Euler(0, 0, 0);  // Reset local rotation so it follows the NPC
         }
     }
 
@@ -90,11 +123,9 @@ public class NPCController : MonoBehaviour
     {
         isPaused = true;
 
-        // Select a random thought from the list in the NPCPathConfig
         string randomThought = npcPathConfig.randomThoughts[Random.Range(0, npcPathConfig.randomThoughts.Count)];
         Debug.Log($"NPC is paused: {randomThought}");
 
-        // Pause for the duration set in the NPCPathConfig
         yield return new WaitForSeconds(pauseDuration);
 
         Debug.Log("NPC finished thinking.");
@@ -105,27 +136,23 @@ public class NPCController : MonoBehaviour
     {
         isPaused = true;
 
-        // Rotate by 90 degrees to the left
         yield return StartCoroutine(Rotate(90));
-        yield return new WaitForSeconds(0.5f); // Short pause between rotations
+        yield return new WaitForSeconds(0.5f);
 
-        // Rotate back to the original position (180 degrees total to complete the "look around")
         yield return StartCoroutine(Rotate(-180));
         yield return new WaitForSeconds(0.5f);
 
-        // Rotate back to the original direction
         yield return StartCoroutine(Rotate(90));
 
         Debug.Log("NPC finished looking around.");
         isPaused = false;
     }
 
-    // Coroutine to smoothly rotate the NPC over time
     private IEnumerator Rotate(float angle)
     {
-        float duration = 1f; // Time to complete the rotation
+        float duration = 1f;
         Quaternion startRotation = transform.rotation;
-        Quaternion endRotation = startRotation * Quaternion.Euler(0, 0, angle); // Rotate around Z-axis in 2D
+        Quaternion endRotation = startRotation * Quaternion.Euler(0, 0, angle);
 
         float timeElapsed = 0;
 
@@ -136,6 +163,6 @@ public class NPCController : MonoBehaviour
             yield return null;
         }
 
-        transform.rotation = endRotation; // Ensure we end at the exact final rotation
+        transform.rotation = endRotation;
     }
 }
