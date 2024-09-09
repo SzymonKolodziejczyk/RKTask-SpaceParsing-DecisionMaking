@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class NPCController : MonoBehaviour
@@ -7,12 +8,18 @@ public class NPCController : MonoBehaviour
     private int currentPathIndex = 0;
     private bool isMoving = false;
     private float moveSpeed;
+    private float pauseDuration;
 
-    public void SetPath(List<GraphGenerator.Node> path, float speed)
+    private bool isPaused = false;
+    private NPCPathConfig npcPathConfig;
+
+    public void SetPath(List<GraphGenerator.Node> path, float speed, NPCPathConfig config)
     {
         currentPath = path;
         currentPathIndex = 0;
         moveSpeed = speed;
+        npcPathConfig = config;
+        pauseDuration = npcPathConfig.pauseDuration;
         isMoving = true;
 
         Debug.Log("NPC path set with the following nodes:");
@@ -24,7 +31,7 @@ public class NPCController : MonoBehaviour
 
     void Update()
     {
-        if (isMoving && currentPath != null && currentPath.Count > 0)
+        if (isMoving && currentPath != null && currentPath.Count > 0 && !isPaused)
         {
             MoveAlongPath();
         }
@@ -48,13 +55,26 @@ public class NPCController : MonoBehaviour
         if (Vector2.Distance(transform.position, targetPosition) < 0.05f)
         {
             Debug.Log($"NPC reached node {currentPathIndex} at position {targetPosition}");
-            currentPathIndex++;
+            
+            // Pause and perform a random action
+            StartCoroutine(PauseAndThink());
 
-            if (currentPathIndex >= currentPath.Count)
-            {
-                currentPathIndex = 0; // Loop back to the start
-                isMoving = true;
-            }
+            currentPathIndex++;
         }
+    }
+
+    private IEnumerator PauseAndThink()
+    {
+        isPaused = true;
+
+        // Select a random thought from the list in the NPCPathConfig
+        string randomThought = npcPathConfig.randomThoughts[Random.Range(0, npcPathConfig.randomThoughts.Count)];
+        Debug.Log($"NPC is paused: {randomThought}");
+
+        // Pause for the duration set in the NPCPathConfig
+        yield return new WaitForSeconds(pauseDuration);
+
+        Debug.Log("NPC finished thinking.");
+        isPaused = false;
     }
 }

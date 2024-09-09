@@ -8,6 +8,9 @@ public class NPCPathConfig : ScriptableObject
     public float npcRadius = 0.5f; // Radius for pathing
     public float moveSpeed = 2f; // Speed of the NPC
 
+    public List<string> randomThoughts;
+    public float pauseDuration = 1f;
+
     [System.Serializable]
     public class Path
     {

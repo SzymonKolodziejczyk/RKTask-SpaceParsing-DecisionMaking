@@ -44,7 +44,7 @@ public class MasterController : MonoBehaviour
             return;
         }
 
-        // Pass the path to NPCController to handle NPC movement
-        npcController.SetPath(path, npcPathConfig.moveSpeed);
+        // Pass the path and npcPathConfig to NPCController to handle NPC movement and pauses
+        npcController.SetPath(path, npcPathConfig.moveSpeed, npcPathConfig);
     }
 }
