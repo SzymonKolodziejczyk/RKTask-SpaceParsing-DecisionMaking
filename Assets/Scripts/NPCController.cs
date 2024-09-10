@@ -55,9 +55,14 @@ public class NPCController : MonoBehaviour
     {
         if (currentPathIndex >= currentPath.Count)
         {
-            Debug.Log("NPC has reached the goal.");
+            //Change it if you want to end the travel when the last node was reached
+
+            /*Debug.Log("NPC has reached the goal.");
             isMoving = false;
-            return;
+            return;*/
+
+            Debug.Log("Looping back to the first node.");
+            currentPathIndex = 0;
         }
 
         Vector2 targetPosition = currentPath[currentPathIndex].position;
@@ -108,7 +113,7 @@ public class NPCController : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         // Smoothly rotate the NPC towards the target direction
-        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+        Quaternion targetRotation = Quaternion.Euler(0, 0, angle-90);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
 
         // Ensure the VisionCone follows the NPC's rotation and points in the direction of movement

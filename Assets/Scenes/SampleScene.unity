@@ -1284,6 +1284,9 @@ MonoBehaviour:
   viewAngle: 90
   viewDistance: 5
   rayCount: 20
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!23 &1179645255
 MeshRenderer:
   m_ObjectHideFlags: 0
